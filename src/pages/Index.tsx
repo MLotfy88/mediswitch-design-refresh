@@ -1,13 +1,70 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from 'react';
+import MobileFrame from '@/components/MobileFrame';
+import BottomNav from '@/components/layout/BottomNav';
+import HomeScreen from '@/components/screens/HomeScreen';
+import SearchResultsScreen from '@/components/screens/SearchResultsScreen';
+import DrugDetailsScreen from '@/components/screens/DrugDetailsScreen';
+
+type Screen = 'home' | 'search' | 'drugDetails';
 
 const Index = () => {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('home');
+  const [activeTab, setActiveTab] = useState('home');
+  const [selectedDrugId, setSelectedDrugId] = useState<string | null>(null);
+
+  const handleDrugClick = (id: string) => {
+    setSelectedDrugId(id);
+    setCurrentScreen('drugDetails');
+  };
+
+  const handleSearch = (query: string) => {
+    if (query.length > 2) {
+      setCurrentScreen('search');
+    }
+  };
+
+  const handleBack = () => {
+    if (currentScreen === 'drugDetails') {
+      setCurrentScreen('search');
+    } else {
+      setCurrentScreen('home');
+    }
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === 'home') {
+      setCurrentScreen('home');
+    } else if (tab === 'search') {
+      setCurrentScreen('search');
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <MobileFrame>
+      {currentScreen === 'home' && (
+        <HomeScreen 
+          onDrugClick={handleDrugClick}
+          onSearch={handleSearch}
+        />
+      )}
+      
+      {currentScreen === 'search' && (
+        <SearchResultsScreen 
+          onBack={handleBack}
+          onDrugClick={handleDrugClick}
+        />
+      )}
+      
+      {currentScreen === 'drugDetails' && (
+        <DrugDetailsScreen onBack={handleBack} />
+      )}
+      
+      <BottomNav 
+        activeTab={activeTab} 
+        onTabChange={handleTabChange} 
+      />
+    </MobileFrame>
   );
 };
 
