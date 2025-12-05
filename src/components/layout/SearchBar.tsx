@@ -8,6 +8,7 @@ interface SearchBarProps {
   onChange?: (value: string) => void;
   onFilterClick?: () => void;
   className?: string;
+  isRTL?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -16,6 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onChange,
   onFilterClick,
   className,
+  isRTL = false,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -40,7 +42,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          dir={isRTL ? 'rtl' : 'ltr'}
+          className={cn(
+            "flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none",
+            isRTL && "font-arabic text-right"
+          )}
         />
 
         <div className="flex items-center gap-2">

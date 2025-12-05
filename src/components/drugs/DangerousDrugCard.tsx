@@ -13,9 +13,10 @@ export interface DangerousDrug {
 interface DangerousDrugCardProps {
   drug: DangerousDrug;
   onClick?: () => void;
+  isRTL?: boolean;
 }
 
-const DangerousDrugCard: React.FC<DangerousDrugCardProps> = ({ drug, onClick }) => {
+const DangerousDrugCard: React.FC<DangerousDrugCardProps> = ({ drug, onClick, isRTL = false }) => {
   const isCritical = drug.riskLevel === 'critical';
 
   return (
@@ -31,7 +32,8 @@ const DangerousDrugCard: React.FC<DangerousDrugCardProps> = ({ drug, onClick }) 
     >
       <div className={cn(
         "w-10 h-10 rounded-xl flex items-center justify-center",
-        isCritical ? "bg-danger/20" : "bg-warning/20"
+        isCritical ? "bg-danger/20" : "bg-warning/20",
+        isRTL && "self-end"
       )}>
         {isCritical ? (
           <Skull className="w-5 h-5 text-danger" />
@@ -40,10 +42,11 @@ const DangerousDrugCard: React.FC<DangerousDrugCardProps> = ({ drug, onClick }) 
         )}
       </div>
       
-      <div className="text-left">
+      <div className={cn(isRTL ? "text-right" : "text-left")}>
         <p className={cn(
           "font-semibold text-sm truncate max-w-[120px]",
-          isCritical ? "text-danger" : "text-warning-foreground"
+          isCritical ? "text-danger" : "text-warning-foreground",
+          isRTL && "font-arabic"
         )}>
           {drug.name}
         </p>
@@ -53,11 +56,12 @@ const DangerousDrugCard: React.FC<DangerousDrugCardProps> = ({ drug, onClick }) 
       </div>
 
       <div className={cn(
-        "flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold self-start",
-        isCritical ? "bg-danger/20 text-danger" : "bg-warning/20 text-warning-foreground"
+        "flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold",
+        isCritical ? "bg-danger/20 text-danger" : "bg-warning/20 text-warning-foreground",
+        isRTL ? "self-end flex-row-reverse font-arabic" : "self-start"
       )}>
         <AlertTriangle className="w-3 h-3" />
-        {drug.interactionCount} interactions
+        {isRTL ? `${drug.interactionCount} تفاعلات` : `${drug.interactionCount} interactions`}
       </div>
     </button>
   );

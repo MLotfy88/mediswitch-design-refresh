@@ -24,6 +24,7 @@ export interface Category {
 interface CategoryCardProps {
   category: Category;
   onClick?: () => void;
+  isRTL?: boolean;
 }
 
 const iconMap: Record<string, LucideIcon> = {
@@ -46,7 +47,7 @@ const colorMap: Record<string, { bg: string; icon: string; border: string }> = {
   teal: { bg: 'bg-secondary/10', icon: 'text-secondary', border: 'border-secondary/20' },
 };
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick, isRTL = false }) => {
   const Icon = iconMap[category.icon] || Pill;
   const colors = colorMap[category.color] || colorMap.blue;
 
@@ -64,11 +65,17 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
         <Icon className={cn("w-6 h-6", colors.icon)} />
       </div>
       <div className="text-center">
-        <p className="text-xs font-semibold text-foreground truncate max-w-[72px]">
-          {category.name}
+        <p className={cn(
+          "text-xs font-semibold text-foreground truncate max-w-[72px]",
+          isRTL && "font-arabic"
+        )}>
+          {isRTL ? category.nameAr : category.name}
         </p>
-        <p className="text-[10px] text-muted-foreground">
-          {category.drugCount} drugs
+        <p className={cn(
+          "text-[10px] text-muted-foreground",
+          isRTL && "font-arabic"
+        )}>
+          {isRTL ? `${category.drugCount} دواء` : `${category.drugCount} drugs`}
         </p>
       </div>
     </button>

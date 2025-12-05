@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowLeft, SlidersHorizontal, X, ArrowDownAZ, ArrowUpAZ } from 'lucide-react';
 import SearchBar from '@/components/layout/SearchBar';
 import DrugCard, { Drug } from '@/components/drugs/DrugCard';
-import { Badge } from '@/components/ui/badge';
+import SearchFiltersSheet, { FilterState } from '@/components/layout/SearchFiltersSheet';
 import { cn } from '@/lib/utils';
 
 const mockSearchResults: Drug[] = [
@@ -57,6 +57,26 @@ const mockSearchResults: Drug[] = [
     company: 'GSK',
     isNew: true,
   },
+  {
+    id: '6',
+    tradeNameEn: 'Brufen 400mg',
+    tradeNameAr: 'بروفين ٤٠٠ مجم',
+    activeIngredient: 'Ibuprofen',
+    form: 'tablet',
+    currentPrice: 75.00,
+    company: 'Pfizer',
+    isPopular: true,
+  },
+  {
+    id: '7',
+    tradeNameEn: 'Voltaren Gel',
+    tradeNameAr: 'فولتارين جل',
+    activeIngredient: 'Diclofenac Sodium',
+    form: 'cream',
+    currentPrice: 120.00,
+    oldPrice: 135.00,
+    company: 'Novartis',
+  },
 ];
 
 const filterOptions = [
@@ -64,6 +84,7 @@ const filterOptions = [
   { id: 'tablet', label: 'Tablets' },
   { id: 'syrup', label: 'Syrups' },
   { id: 'injection', label: 'Injections' },
+  { id: 'cream', label: 'Creams' },
 ];
 
 interface SearchResultsScreenProps {
@@ -81,6 +102,12 @@ const SearchResultsScreen: React.FC<SearchResultsScreenProps> = ({
   const [activeFilter, setActiveFilter] = useState('all');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    priceRange: [0, 500],
+    companies: [],
+    forms: [],
+    sortBy: 'relevance',
+  });
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => {
@@ -94,9 +121,51 @@ const SearchResultsScreen: React.FC<SearchResultsScreenProps> = ({
     });
   };
 
-  const filteredResults = mockSearchResults.filter(
-    (drug) => activeFilter === 'all' || drug.form === activeFilter
-  );
+  // Apply all filters
+  const filteredResults = mockSearchResults.filter((drug) => {
+    // Form filter (quick filter pills)
+    if (activeFilter !== 'all' && drug.form !== activeFilter) return false;
+    
+    // Price range filter
+    if (drug.currentPrice < filters.priceRange[0] || drug.currentPrice > filters.priceRange[1]) return false;
+    
+    // Company filter
+    if (filters.companies.length > 0 && !filters.companies.includes(drug.company)) return false;
+    
+    // Form filter from sheet
+    if (filters.forms.length > 0 && !filters.forms.includes(drug.form)) return false;
+    
+    // Search query
+    if (searchValue && !drug.tradeNameEn.toLowerCase().includes(searchValue.toLowerCase()) &&
+        !drug.tradeNameAr.includes(searchValue) &&
+        !drug.activeIngredient.toLowerCase().includes(searchValue.toLowerCase())) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  // Sort results
+  const sortedResults = [...filteredResults].sort((a, b) => {
+    switch (filters.sortBy) {
+      case 'price-low':
+        return a.currentPrice - b.currentPrice;
+      case 'price-high':
+        return b.currentPrice - a.currentPrice;
+      case 'name-az':
+        return a.tradeNameEn.localeCompare(b.tradeNameEn);
+      case 'newest':
+        return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0);
+      default:
+        return 0;
+    }
+  });
+
+  const activeFiltersCount = 
+    (filters.companies.length > 0 ? 1 : 0) +
+    (filters.forms.length > 0 ? 1 : 0) +
+    (filters.priceRange[0] > 0 || filters.priceRange[1] < 500 ? 1 : 0) +
+    (filters.sortBy !== 'relevance' ? 1 : 0);
 
   return (
     <div className="pb-24 bg-background min-h-screen">
@@ -113,7 +182,7 @@ const SearchResultsScreen: React.FC<SearchResultsScreenProps> = ({
             <SearchBar
               value={searchValue}
               onChange={setSearchValue}
-              onFilterClick={() => setShowFilters(!showFilters)}
+              onFilterClick={() => setShowFilters(true)}
             />
           </div>
         </div>
@@ -139,20 +208,30 @@ const SearchResultsScreen: React.FC<SearchResultsScreenProps> = ({
         </div>
       </div>
 
-      {/* Results Count */}
+      {/* Results Count & Active Filters */}
       <div className="px-4 py-3 flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-foreground">{filteredResults.length}</span> results for "{searchValue}"
-        </p>
-        <button className="flex items-center gap-1 text-sm text-primary font-medium">
+        <div className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">{sortedResults.length}</span> results
+          </p>
+          {activeFiltersCount > 0 && (
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+              {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} active
+            </span>
+          )}
+        </div>
+        <button 
+          onClick={() => setShowFilters(true)}
+          className="flex items-center gap-1 text-sm text-primary font-medium"
+        >
           <SlidersHorizontal className="w-4 h-4" />
-          Sort
+          Filters
         </button>
       </div>
 
       {/* Results List */}
       <div className="px-4 space-y-3">
-        {filteredResults.map((drug, index) => (
+        {sortedResults.map((drug, index) => (
           <div
             key={drug.id}
             className="animate-fade-in"
@@ -168,7 +247,7 @@ const SearchResultsScreen: React.FC<SearchResultsScreenProps> = ({
       </div>
 
       {/* No Results State */}
-      {filteredResults.length === 0 && (
+      {sortedResults.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
             <X className="w-10 h-10 text-muted-foreground" />
@@ -179,6 +258,14 @@ const SearchResultsScreen: React.FC<SearchResultsScreenProps> = ({
           </p>
         </div>
       )}
+
+      {/* Filters Sheet */}
+      <SearchFiltersSheet
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        filters={filters}
+        onApplyFilters={setFilters}
+      />
     </div>
   );
 };
