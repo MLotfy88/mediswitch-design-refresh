@@ -23,6 +23,7 @@ interface DrugCardProps {
   onFavoriteToggle?: (id: string) => void;
   onClick?: () => void;
   className?: string;
+  isRTL?: boolean;
 }
 
 const formIcons = {
@@ -46,10 +47,18 @@ const formLabels = {
   drops: 'Drops',
 };
 
-const DrugCard: React.FC<DrugCardProps> = ({ drug, onFavoriteToggle, onClick, className }) => {
+const DrugCard: React.FC<DrugCardProps> = ({ drug, onFavoriteToggle, onClick, className, isRTL = false }) => {
   const FormIcon = formIcons[drug.form];
   const priceChange = drug.oldPrice ? ((drug.currentPrice - drug.oldPrice) / drug.oldPrice) * 100 : 0;
   const isPriceDown = priceChange < 0;
+
+  const formLabelsRTL: Record<string, string> = {
+    tablet: 'أقراص',
+    syrup: 'شراب',
+    injection: 'حقن',
+    cream: 'كريم',
+    drops: 'قطرة',
+  };
 
   return (
     <div
@@ -58,19 +67,28 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, onFavoriteToggle, onClick, cl
         className
       )}
       onClick={onClick}
+      dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Header Row */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-foreground truncate">{drug.tradeNameEn}</h3>
-            <div className="flex gap-1 flex-shrink-0">
-              {drug.isNew && <Badge variant="new" size="sm">NEW</Badge>}
-              {drug.isPopular && <Badge variant="popular" size="sm">POPULAR</Badge>}
+          <div className={cn("flex items-center gap-2 mb-1", isRTL && "flex-row-reverse justify-end")}>
+            <h3 className={cn(
+              "font-semibold text-foreground truncate",
+              isRTL && "font-arabic"
+            )}>
+              {isRTL ? drug.tradeNameAr : drug.tradeNameEn}
+            </h3>
+            <div className={cn("flex gap-1 flex-shrink-0", isRTL && "flex-row-reverse")}>
+              {drug.isNew && <Badge variant="new" size="sm">{isRTL ? 'جديد' : 'NEW'}</Badge>}
+              {drug.isPopular && <Badge variant="popular" size="sm">{isRTL ? 'رائج' : 'POPULAR'}</Badge>}
             </div>
           </div>
-          <p className="text-sm text-muted-foreground font-arabic truncate" dir="rtl">
-            {drug.tradeNameAr}
+          <p className={cn(
+            "text-sm text-muted-foreground truncate",
+            isRTL ? "" : "font-arabic"
+          )} dir={isRTL ? 'ltr' : 'rtl'}>
+            {isRTL ? drug.tradeNameEn : drug.tradeNameAr}
           </p>
         </div>
         
@@ -91,20 +109,30 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, onFavoriteToggle, onClick, cl
       </div>
 
       {/* Form & Active Ingredient */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex items-center gap-1.5 px-2 py-1 bg-accent rounded-md">
+      <div className={cn("flex items-center gap-2 mb-3", isRTL && "flex-row-reverse")}>
+        <div className={cn("flex items-center gap-1.5 px-2 py-1 bg-accent rounded-md", isRTL && "flex-row-reverse")}>
           <FormIcon className="w-3.5 h-3.5 text-accent-foreground" />
-          <span className="text-xs font-medium text-accent-foreground">{formLabels[drug.form]}</span>
+          <span className={cn(
+            "text-xs font-medium text-accent-foreground",
+            isRTL && "font-arabic"
+          )}>
+            {isRTL ? formLabelsRTL[drug.form] : formLabels[drug.form]}
+          </span>
         </div>
         <span className="text-xs text-muted-foreground">•</span>
-        <span className="text-xs text-muted-foreground truncate">{drug.activeIngredient}</span>
+        <span className={cn(
+          "text-xs text-muted-foreground truncate",
+          isRTL && "font-arabic"
+        )}>
+          {drug.activeIngredient}
+        </span>
       </div>
 
       {/* Price Section */}
-      <div className="flex items-end justify-between">
-        <div className="flex items-baseline gap-2">
-          <span className="text-xl font-bold text-foreground">
-            {drug.currentPrice.toFixed(2)} EGP
+      <div className={cn("flex items-end justify-between", isRTL && "flex-row-reverse")}>
+        <div className={cn("flex items-baseline gap-2", isRTL && "flex-row-reverse")}>
+          <span className={cn("text-xl font-bold text-foreground", isRTL && "font-arabic")}>
+            {drug.currentPrice.toFixed(2)} {isRTL ? 'ج.م' : 'EGP'}
           </span>
           {drug.oldPrice && (
             <span className="text-sm text-muted-foreground line-through">
@@ -114,8 +142,8 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, onFavoriteToggle, onClick, cl
         </div>
         
         {priceChange !== 0 && (
-          <Badge variant={isPriceDown ? "priceDown" : "priceUp"} size="sm">
-            {isPriceDown ? <TrendingDown className="w-3 h-3 mr-1" /> : <TrendingUp className="w-3 h-3 mr-1" />}
+          <Badge variant={isPriceDown ? "priceDown" : "priceUp"} size="sm" className={isRTL ? "flex-row-reverse" : ""}>
+            {isPriceDown ? <TrendingDown className="w-3 h-3 mx-1" /> : <TrendingUp className="w-3 h-3 mx-1" />}
             {Math.abs(priceChange).toFixed(0)}%
           </Badge>
         )}
@@ -123,9 +151,17 @@ const DrugCard: React.FC<DrugCardProps> = ({ drug, onFavoriteToggle, onClick, cl
 
       {/* Interaction Warning */}
       {drug.hasInteraction && (
-        <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-danger-soft rounded-lg">
+        <div className={cn(
+          "mt-3 flex items-center gap-2 px-3 py-2 bg-danger-soft rounded-lg",
+          isRTL && "flex-row-reverse"
+        )}>
           <AlertTriangle className="w-4 h-4 text-danger flex-shrink-0" />
-          <span className="text-xs font-medium text-danger">Interaction Warning</span>
+          <span className={cn(
+            "text-xs font-medium text-danger",
+            isRTL && "font-arabic"
+          )}>
+            {isRTL ? 'تحذير: تفاعل دوائي' : 'Interaction Warning'}
+          </span>
         </div>
       )}
     </div>
