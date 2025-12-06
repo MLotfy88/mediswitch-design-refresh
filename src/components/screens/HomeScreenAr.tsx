@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, AlertTriangle, TrendingUp, Pill } from 'lucide-react';
+import { Sparkles, AlertTriangle, TrendingUp, Pill, Calculator, GitCompare } from 'lucide-react';
 import AppHeaderAr from '@/components/layout/AppHeaderAr';
 import SearchBar from '@/components/layout/SearchBar';
 import SectionHeaderAr from '@/components/layout/SectionHeaderAr';
@@ -65,9 +65,11 @@ const recentDrugs: Drug[] = [
 interface HomeScreenArProps {
   onDrugClick?: (id: string) => void;
   onSearch?: (query: string) => void;
+  onInteractionsClick?: () => void;
+  onDoseCalculatorClick?: () => void;
 }
 
-const HomeScreenAr: React.FC<HomeScreenArProps> = ({ onDrugClick, onSearch }) => {
+const HomeScreenAr: React.FC<HomeScreenArProps> = ({ onDrugClick, onSearch, onInteractionsClick, onDoseCalculatorClick }) => {
   const [searchValue, setSearchValue] = React.useState('');
   const [favorites, setFavorites] = React.useState<Set<string>>(new Set(['2']));
 
@@ -107,9 +109,35 @@ const HomeScreenAr: React.FC<HomeScreenArProps> = ({ onDrugClick, onSearch }) =>
             <TrendingUp className="w-5 h-5 text-success" />
           </div>
         </div>
-      </div>
 
-      {/* Categories Section */}
+        {/* Quick Tools */}
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            onClick={onInteractionsClick}
+            className="flex items-center gap-3 p-4 bg-warning/10 border border-warning/20 rounded-xl hover:bg-warning/20 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
+              <GitCompare className="w-5 h-5 text-warning" />
+            </div>
+            <div className="text-start">
+              <p className="font-semibold text-foreground text-sm font-arabic">التفاعلات</p>
+              <p className="text-xs text-muted-foreground font-arabic">فحص التعارضات</p>
+            </div>
+          </button>
+          <button
+            onClick={onDoseCalculatorClick}
+            className="flex items-center gap-3 p-4 bg-primary/10 border border-primary/20 rounded-xl hover:bg-primary/20 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Calculator className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-start">
+              <p className="font-semibold text-foreground text-sm font-arabic">الجرعات</p>
+              <p className="text-xs text-muted-foreground font-arabic">حساب الجرعة</p>
+            </div>
+          </button>
+        </div>
+      </div>
       <section className="px-4 mb-6">
         <SectionHeaderAr
           title="التخصصات الطبية"

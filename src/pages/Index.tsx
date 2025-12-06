@@ -9,10 +9,12 @@ import FavoritesScreen from '@/components/screens/FavoritesScreen';
 import HistoryScreen from '@/components/screens/HistoryScreen';
 import ProfileScreen from '@/components/screens/ProfileScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
+import InteractionsScreen from '@/components/screens/InteractionsScreen';
+import DoseCalculatorScreen from '@/components/screens/DoseCalculatorScreen';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { ThemeProvider, useTheme } from '@/hooks/useTheme';
 
-type Screen = 'home' | 'search' | 'drugDetails' | 'favorites' | 'history' | 'profile' | 'settings';
+type Screen = 'home' | 'search' | 'drugDetails' | 'favorites' | 'history' | 'profile' | 'settings' | 'interactions' | 'doseCalculator';
 
 const AppContent = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -63,11 +65,15 @@ const AppContent = () => {
             <HomeScreenAr 
               onDrugClick={handleDrugClick}
               onSearch={handleSearch}
+              onInteractionsClick={() => setCurrentScreen('interactions')}
+              onDoseCalculatorClick={() => setCurrentScreen('doseCalculator')}
             />
           ) : (
             <HomeScreen 
               onDrugClick={handleDrugClick}
               onSearch={handleSearch}
+              onInteractionsClick={() => setCurrentScreen('interactions')}
+              onDoseCalculatorClick={() => setCurrentScreen('doseCalculator')}
             />
           )
         )}
@@ -97,6 +103,14 @@ const AppContent = () => {
 
         {currentScreen === 'settings' && (
           <SettingsScreen onBack={() => setCurrentScreen('profile')} />
+        )}
+
+        {currentScreen === 'interactions' && (
+          <InteractionsScreen onBack={() => setCurrentScreen('home')} />
+        )}
+
+        {currentScreen === 'doseCalculator' && (
+          <DoseCalculatorScreen onBack={() => setCurrentScreen('home')} />
         )}
         
         <BottomNav
