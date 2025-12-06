@@ -5,10 +5,13 @@ import HomeScreen from '@/components/screens/HomeScreen';
 import HomeScreenAr from '@/components/screens/HomeScreenAr';
 import SearchResultsScreen from '@/components/screens/SearchResultsScreen';
 import DrugDetailsScreen from '@/components/screens/DrugDetailsScreen';
+import FavoritesScreen from '@/components/screens/FavoritesScreen';
+import HistoryScreen from '@/components/screens/HistoryScreen';
+import ProfileScreen from '@/components/screens/ProfileScreen';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { ThemeProvider, useTheme } from '@/hooks/useTheme';
 
-type Screen = 'home' | 'search' | 'drugDetails';
+type Screen = 'home' | 'search' | 'drugDetails' | 'favorites' | 'history' | 'profile';
 
 const AppContent = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -41,6 +44,12 @@ const AppContent = () => {
       setCurrentScreen('home');
     } else if (tab === 'search') {
       setCurrentScreen('search');
+    } else if (tab === 'favorites') {
+      setCurrentScreen('favorites');
+    } else if (tab === 'history') {
+      setCurrentScreen('history');
+    } else if (tab === 'profile') {
+      setCurrentScreen('profile');
     }
   };
 
@@ -72,8 +81,20 @@ const AppContent = () => {
         {currentScreen === 'drugDetails' && (
           <DrugDetailsScreen onBack={handleBack} />
         )}
+
+        {currentScreen === 'favorites' && (
+          <FavoritesScreen onDrugClick={handleDrugClick} />
+        )}
+
+        {currentScreen === 'history' && (
+          <HistoryScreen onDrugClick={handleDrugClick} />
+        )}
+
+        {currentScreen === 'profile' && (
+          <ProfileScreen />
+        )}
         
-        <BottomNav 
+        <BottomNav
           activeTab={activeTab} 
           onTabChange={handleTabChange} 
         />

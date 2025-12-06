@@ -1,19 +1,21 @@
 import React from 'react';
 import { Home, Search, Heart, User, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/hooks/useTheme';
 
 interface NavItem {
   id: string;
   icon: React.ElementType;
-  label: string;
+  labelEn: string;
+  labelAr: string;
 }
 
 const navItems: NavItem[] = [
-  { id: 'home', icon: Home, label: 'Home' },
-  { id: 'search', icon: Search, label: 'Search' },
-  { id: 'history', icon: History, label: 'History' },
-  { id: 'favorites', icon: Heart, label: 'Favorites' },
-  { id: 'profile', icon: User, label: 'Profile' },
+  { id: 'home', icon: Home, labelEn: 'Home', labelAr: 'الرئيسية' },
+  { id: 'search', icon: Search, labelEn: 'Search', labelAr: 'بحث' },
+  { id: 'history', icon: History, labelEn: 'History', labelAr: 'السجل' },
+  { id: 'favorites', icon: Heart, labelEn: 'Favorites', labelAr: 'المفضلة' },
+  { id: 'profile', icon: User, labelEn: 'Profile', labelAr: 'الحساب' },
 ];
 
 interface BottomNavProps {
@@ -22,6 +24,8 @@ interface BottomNavProps {
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) => {
+  const { language } = useTheme();
+  
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-surface/95 backdrop-blur-lg border-t border-border safe-area-bottom">
       <div className="flex items-center justify-around py-2 px-2">
@@ -50,7 +54,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) => {
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                {item.label}
+                {language === 'ar' ? item.labelAr : item.labelEn}
               </span>
             </button>
           );
