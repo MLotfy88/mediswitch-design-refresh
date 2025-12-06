@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, AlertTriangle, TrendingUp, Pill } from 'lucide-react';
+import { Sparkles, AlertTriangle, TrendingUp, Pill, Calculator, GitCompare } from 'lucide-react';
 import AppHeader from '@/components/layout/AppHeader';
 import SearchBar from '@/components/layout/SearchBar';
 import SectionHeader from '@/components/layout/SectionHeader';
@@ -65,9 +65,11 @@ const recentDrugs: Drug[] = [
 interface HomeScreenProps {
   onDrugClick?: (id: string) => void;
   onSearch?: (query: string) => void;
+  onInteractionsClick?: () => void;
+  onDoseCalculatorClick?: () => void;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ onDrugClick, onSearch }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ onDrugClick, onSearch, onInteractionsClick, onDoseCalculatorClick }) => {
   const [searchValue, setSearchValue] = React.useState('');
   const [favorites, setFavorites] = React.useState<Set<string>>(new Set(['2']));
 
@@ -104,6 +106,34 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onDrugClick, onSearch }) => {
             <span className="text-sm font-medium text-success">Today's Updates</span>
           </div>
           <Badge variant="new" size="lg">+30 Drugs</Badge>
+        </div>
+
+        {/* Quick Tools */}
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            onClick={onInteractionsClick}
+            className="flex items-center gap-3 p-4 bg-warning/10 border border-warning/20 rounded-xl hover:bg-warning/20 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
+              <GitCompare className="w-5 h-5 text-warning" />
+            </div>
+            <div className="text-start">
+              <p className="font-semibold text-foreground text-sm">Interactions</p>
+              <p className="text-xs text-muted-foreground">Check conflicts</p>
+            </div>
+          </button>
+          <button
+            onClick={onDoseCalculatorClick}
+            className="flex items-center gap-3 p-4 bg-primary/10 border border-primary/20 rounded-xl hover:bg-primary/20 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Calculator className="w-5 h-5 text-primary" />
+            </div>
+            <div className="text-start">
+              <p className="font-semibold text-foreground text-sm">Dose Calc</p>
+              <p className="text-xs text-muted-foreground">Calculate dosage</p>
+            </div>
+          </button>
         </div>
       </div>
 
