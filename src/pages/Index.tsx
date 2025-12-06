@@ -8,10 +8,11 @@ import DrugDetailsScreen from '@/components/screens/DrugDetailsScreen';
 import FavoritesScreen from '@/components/screens/FavoritesScreen';
 import HistoryScreen from '@/components/screens/HistoryScreen';
 import ProfileScreen from '@/components/screens/ProfileScreen';
+import SettingsScreen from '@/components/screens/SettingsScreen';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { ThemeProvider, useTheme } from '@/hooks/useTheme';
 
-type Screen = 'home' | 'search' | 'drugDetails' | 'favorites' | 'history' | 'profile';
+type Screen = 'home' | 'search' | 'drugDetails' | 'favorites' | 'history' | 'profile' | 'settings';
 
 const AppContent = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('home');
@@ -91,7 +92,11 @@ const AppContent = () => {
         )}
 
         {currentScreen === 'profile' && (
-          <ProfileScreen />
+          <ProfileScreen onSettingsClick={() => setCurrentScreen('settings')} />
+        )}
+
+        {currentScreen === 'settings' && (
+          <SettingsScreen onBack={() => setCurrentScreen('profile')} />
         )}
         
         <BottomNav
