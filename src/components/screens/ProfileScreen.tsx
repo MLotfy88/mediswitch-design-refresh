@@ -31,9 +31,14 @@ const menuItems: MenuItem[] = [
   { id: 'language', labelEn: 'Language', labelAr: 'اللغة', icon: Globe, type: 'link' },
   { id: 'privacy', labelEn: 'Privacy & Security', labelAr: 'الخصوصية والأمان', icon: Shield, type: 'link' },
   { id: 'help', labelEn: 'Help & Support', labelAr: 'المساعدة والدعم', icon: HelpCircle, type: 'link' },
+  { id: 'settings', labelEn: 'Settings', labelAr: 'الإعدادات', icon: Settings, type: 'link' },
 ];
 
-const ProfileScreen: React.FC = () => {
+interface ProfileScreenProps {
+  onSettingsClick?: () => void;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSettingsClick }) => {
   const { language, isRTL, theme, toggleTheme, toggleLanguage } = useTheme();
 
   return (
@@ -91,6 +96,7 @@ const ProfileScreen: React.FC = () => {
                 onClick={() => {
                   if (isDarkModeItem) toggleTheme();
                   if (isLanguageItem) toggleLanguage();
+                  if (item.id === 'settings') onSettingsClick?.();
                 }}
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-4 transition-colors hover:bg-muted/50",
